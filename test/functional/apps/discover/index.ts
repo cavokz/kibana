@@ -12,7 +12,7 @@ export default function ({ getService, loadTestFile }: FtrProviderContext) {
   const esArchiver = getService('esArchiver');
   const browser = getService('browser');
 
-  describe('discover app', function () {
+  describe.only('discover app', function () {
     this.tags('ciGroup6');
 
     before(function () {
@@ -23,7 +23,7 @@ export default function ({ getService, loadTestFile }: FtrProviderContext) {
       return esArchiver.unload('logstash_functional');
     });
 
-    // loadTestFile(require.resolve('./_saved_queries'));
+    loadTestFile(require.resolve('./_saved_queries'));
     loadTestFile(require.resolve('./_discover'));
     // loadTestFile(require.resolve('./_discover_histogram'));
     // loadTestFile(require.resolve('./_doc_table'));
