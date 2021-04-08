@@ -8,6 +8,7 @@
 
 import expect from '@kbn/expect';
 
+import { createFailError } from '@kbn/dev-utils';
 import { FtrProviderContext } from '../../ftr_provider_context';
 
 export default function ({ getService, getPageObjects }: FtrProviderContext) {
@@ -30,27 +31,13 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
     before(async function () {
       log.debug('load kibana index with default index pattern');
 
-      log.info(
+      throw createFailError(
         `\n### SAVED OBJECT TYPES IN index: [.kibana]: \n\t${await savedObjectInfo.types()}`
       );
-      log.debug(
-        `\n### SAVED OBJECT TYPES IN index: [.kibana]: \n\t${await savedObjectInfo.types()}`
-      );
+
       await esArchiver.load('empty_kibana');
-      log.info(
-        `\n### SAVED OBJECT TYPES IN index: [.kibana]: \n\t${await savedObjectInfo.types()}`
-      );
-      log.debug(
-        `\n### SAVED OBJECT TYPES IN index: [.kibana]: \n\t${await savedObjectInfo.types()}`
-      );
       await PageObjects.common.sleep(5000);
       await kibanaServer.importExport.load('discover');
-      log.info(
-        `\n### SAVED OBJECT TYPES IN index: [.kibana]: \n\t${await savedObjectInfo.types()}`
-      );
-      log.debug(
-        `\n### SAVED OBJECT TYPES IN index: [.kibana]: \n\t${await savedObjectInfo.types()}`
-      );
 
       // and load a set of makelogs data
       await esArchiver.loadIfNeeded('logstash_functional');
