@@ -32,7 +32,11 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       log.debug('load kibana index with default index pattern');
 
       throw createFailError(
-        `\n### SAVED OBJECT TYPES IN index: [.kibana]: \n\t${await savedObjectInfo.types()}`
+        `\n### SAVED OBJECT TYPES IN index: [.kibana]: \n\t${await JSON.stringify(
+          savedObjectInfo.types(),
+          null,
+          2
+        )}`
       );
 
       await esArchiver.load('empty_kibana');
