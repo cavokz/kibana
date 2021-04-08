@@ -9,6 +9,7 @@
 import expect from '@kbn/expect';
 
 import { createFailError } from '@kbn/dev-utils';
+import { inspect } from 'util';
 import { FtrProviderContext } from '../../ftr_provider_context';
 
 export default function ({ getService, getPageObjects }: FtrProviderContext) {
@@ -32,11 +33,12 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       log.debug('load kibana index with default index pattern');
 
       throw createFailError(
-        `\n### SAVED OBJECT TYPES IN index: [.kibana]: \n\t${await JSON.stringify(
-          savedObjectInfo.types(),
-          null,
-          2
-        )}`
+        `\n### SAVED OBJECT TYPES IN index: [.kibana]: \n${inspect(await savedObjectInfo.types(), {
+          compact: false,
+          depth: 99,
+          breakLength: 80,
+          sorted: true,
+        })}`
       );
 
       await esArchiver.load('empty_kibana');
