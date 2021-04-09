@@ -32,6 +32,8 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
     before(async function () {
       log.debug('load kibana index with default index pattern');
 
+      await esArchiver.load('empty_kibana');
+
       throw createFailError(
         `\n### SAVED OBJECT TYPES IN index: [.kibana]: \n${inspect(await savedObjectInfo.types(), {
           compact: false,
@@ -41,7 +43,6 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
         })}`
       );
 
-      await esArchiver.load('empty_kibana');
       await PageObjects.common.sleep(5000);
       await kibanaServer.importExport.load('discover');
 
