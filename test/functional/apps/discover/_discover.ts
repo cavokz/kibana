@@ -32,9 +32,18 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
     before(async function () {
       log.debug('load kibana index with default index pattern');
 
-      // await esArchiver.load('empty_kibana');
+      await esArchiver.load('empty_kibana');
       await kibanaServer.savedObjects.clean({ types: ['search', 'index-pattern'] });
       await kibanaServer.importExport.load('discover');
+
+      // throw createFailError(
+      //   `\n### SAVED OBJECT TYPES IN index: [.kibana]: \n${inspect(await savedObjectInfo.types(), {
+      //     compact: false,
+      //     depth: 99,
+      //     breakLength: 80,
+      //     sorted: true,
+      //   })}`
+      // );
 
       // and load a set of makelogs data
       await esArchiver.loadIfNeeded('logstash_functional');
