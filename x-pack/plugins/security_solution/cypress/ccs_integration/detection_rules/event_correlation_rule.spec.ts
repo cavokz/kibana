@@ -57,7 +57,11 @@ import {
   waitForRulesTableToBeLoaded,
 } from '../../tasks/alerts_detection_rules';
 import { createTimeline } from '../../tasks/api_calls/timelines';
-import { createEventCorrelationRule } from '../../tasks/api_calls/rules';
+import {
+  createSignalsIndex,
+  createEventCorrelationRule,
+  deleteCustomRule,
+} from '../../tasks/api_calls/rules';
 import { cleanKibana } from '../../tasks/common';
 import {
   createAndActivateRule,
@@ -73,41 +77,29 @@ import { loginAndWaitForPageWithoutDateRange } from '../../tasks/login';
 import { ALERTS_URL } from '../../urls/navigation';
 
 describe('Detection rules', function () {
-  const expectedNumberOfRules = 1;
   const expectedNumberOfAlerts = '100 alerts';
 
-  beforeEach(function () {
+  before('Prepare the index and the EQL rule', function () {
     cleanKibana();
     esArchiverCCSLoad('run-parts');
-    createTimeline(getCCSEqlRule().timeline).then((response) => {
-      cy.wrap({
-        ...getCCSEqlRule(),
-        timeline: {
-          ...getCCSEqlRule().timeline,
-          id: response.body.data.persistTimeline.timeline.savedObjectId,
-        },
-      }).as('rule');
-    });
+    this.rule = getCCSEqlRule();
+    createSignalsIndex();
+    createEventCorrelationRule(this.rule, 'test_eql_rule');
   });
 
-  afterEach(function () {
+  after('Clean up the EQL rule and the index', function () {
+    deleteCustomRule('test_eql_rule');
     esArchiverCCSUnload('run-parts');
   });
 
-  it('Creates and activates a new EQL rule', function () {
+  it('EQL rule on remote indices generates alerts', function () {
     loginAndWaitForPageWithoutDateRange(ALERTS_URL);
     waitForAlertsPanelToBeLoaded();
     waitForAlertsIndexToBeCreated();
     goToManageAlertsDetectionRules();
     waitForRulesTableToBeLoaded();
 
-    createEventCorrelationRule(this.rule);
-
     changeRowsPerPageTo100();
-
-    cy.get(RULES_TABLE).then(($table) => {
-      cy.wrap($table.find(RULES_ROW).length).should('eql', expectedNumberOfRules);
-    });
 
     filterByCustomRules();
     goToRuleDetails();
